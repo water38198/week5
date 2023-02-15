@@ -71,7 +71,6 @@ const app = Vue.createApp({
                 });
         },
         updateItemNum(item) {
-            console.log(item);
             const data = {
                 product_id: item.product.id,
                 qty: item.qty,
