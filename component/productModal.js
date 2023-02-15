@@ -5,7 +5,12 @@ export default {
 
     <div class="modal  fade " id="productModal" tabindex="-1" aria-labelledby="prodcutModalLabel" aria-hidden="true" ref="modal">
     <div class="modal-dialog modal-xl">
-        <div class="modal-content">
+        <div class="modal-content vl-parent">
+                    <template v-if="modalLoading">
+                <div>
+                    <loading v-model:active="modalLoading" :is-full-page="false" />
+                </div>
+            </template>
         <div class="modal-header">
             <h5 class="modal-title" id="productModalLabel">
                 {{tempProduct.title}}
@@ -53,18 +58,19 @@ export default {
             tempProduct: {},
             modal: {},
             qty: 1,
+            modalLoading: false,
         };
     },
     mounted() {
         this.modal = new bootstrap.Modal(this.$refs.modal);
         this.$refs.modal.addEventListener("hidden.bs.modal", (event) => {
             this.openModal("");
-            this.closeLoading();
         });
     },
     props: ["productId", "addToCart", "openModal", "closeLoading"],
     watch: {
         productId() {
+            this.modalLoading = true;
             //沒有id時不要戳api
             if (this.productId) {
                 axios
@@ -74,7 +80,7 @@ export default {
                     .then((res) => {
                         this.tempProduct = res.data.product;
                         this.modal.show();
-                        this.closeLoading();
+                        this.modalLoading = false;
                     });
             }
         },

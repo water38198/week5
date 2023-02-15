@@ -27,107 +27,122 @@
 <body>
 
     <div class="container mt-4 " id="app">
-        <template v-if="isLoading">
-            <loading v-model:active="isLoading" />
-
-        </template>
         <!-- 產品列表 -->
         <h3 class="mt-5 mb-3 text-center">商品列表</h3>
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th>圖片</th>
-                    <th>商品名稱</th>
-                    <th>價格</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="product in productList" :key="product.key">
-                    <td style="width:200px;">
-                        <img :src="product.imageUrl" :alt=`${product.title}圖片` style="height: 100px;object-fit: cover;"
-                            class="w-100">
-                    </td>
-                    <td>{{product.title}}</td>
-                    <td>
-                        <div class="h5" v-if="product.origin_price === product.price">
-                            {{product.price}}元
-                        </div>
-                        <div v-else>
-                            <del class="h6">原價{{product.origin_price}}元</del>
-                            <div class="h5">現在只要{{product.price}}元</div>
-                        </div>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-outline-primary me-2"
-                            @click="openModal(product.id)">查看更多</button>
-                        <button type="button" class="btn btn-outline-danger" @click="addToCart(product.id)"
-                            :disabled="loadingItem === product.id">加入購物車</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
+        <div class="vl-parent">
+            <template v-if="isLoading">
+                <div>
+                    <loading v-model:active="isLoading.productList" :is-full-page="false" />
+                </div>
+            </template>
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>圖片</th>
+                        <th>商品名稱</th>
+                        <th>價格</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="product in productList" :key="product.key">
+                        <td style="width:200px;">
+                            <img :src="product.imageUrl" :alt=`${product.title}圖片`
+                                style="height: 100px;object-fit: cover;" class="w-100">
+                        </td>
+                        <td>{{product.title}}</td>
+                        <td>
+                            <div class="h5" v-if="product.origin_price === product.price">
+                                {{product.price}}元
+                            </div>
+                            <div v-else>
+                                <del class="h6">原價{{product.origin_price}}元</del>
+                                <div class="h5">現在只要{{product.price}}元</div>
+                            </div>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-outline-primary me-2"
+                                @click="openModal(product.id)">查看更多</button>
+                            <button type="button" class="btn btn-outline-danger" @click="addToCart(product.id)"
+                                :disabled="loadingItem === product.id">加入購物車</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <!-- 產品Modal -->
         <product-Modal :product-Id="productId" :add-To-Cart="addToCart" :open-Modal="openModal"
-            :close-Loading="closeLoading" ref="productModal"></product-Modal>
+            ref="productModal"></product-Modal>
         <!-- 購物車列表 -->
         <h3 class="mt-5 mb-3 text-center">購物車</h3>
-        <table class="table mt-5 align-middle">
-            <thead>
-                <tr>
-                    <th></th>
-                    <th>產品名稱</th>
-                    <th>數量/單位</th>
-                    <th class="text-end">單價</th>
-                    <th class="text-end">總價</th>
-                </tr>
-            </thead>
-            <tbody>
-                <template v-if="cart.carts">
-                    <tr v-for="item in cart.carts" :key="item.id">
-                        <td>
-                            <button type="button" class="btn btn-outline-danger btn-sm" @click="deleteCartItem(item.id)"
-                                :disabled="loadingItem === item.id">X</button>
-                        </td>
-                        <td>{{item.product.title}}</td>
-                        <td>
-                            <select name="" id="" class="form-select" v-model="item.qty" @change="updateItemNum(item)"
-                                :disabled="loadingItem === item.id">
-                                <option :value="i" v-for="i in 15" :key="i+'123'">{{i}}</option>
-                            </select>
-                        </td>
-                        <td class="text-end">{{item.product.price}}</td>
-                        <td class="text-end">{{item.final_total}}</td>
+        <div class="vl-parent">
+            <template v-if="isLoading">
+                <div>
+                    <loading v-model:active="isLoading.cart" :is-full-page="false" />
+                </div>
+            </template>
+            <table class="table mt-5 align-middle">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>產品名稱</th>
+                        <th>數量/單位</th>
+                        <th class="text-end">單價</th>
+                        <th class="text-end">總價</th>
                     </tr>
-                </template>
+                </thead>
+                <tbody>
+                    <template v-if="cart.carts?.length">
+                        <tr v-for="item in cart.carts" :key="item.id">
+                            <td>
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                    @click="deleteCartItem(item.id)" :disabled="loadingItem === item.id">X</button>
+                            </td>
+                            <td>{{item.product.title}}</td>
+                            <td>
+                                <select name="" id="" class="form-select" v-model="item.qty"
+                                    @change="updateItemNum(item)" :disabled="loadingItem === item.id">
+                                    <option :value="i" v-for="i in 15" :key="i+'123'">{{i}}</option>
+                                </select>
+                            </td>
+                            <td class="text-end">{{item.product.price}}</td>
+                            <td class="text-end">{{item.final_total}}</td>
+                        </tr>
+                    </template>
+                    <template v-else>
+                        <tr>
+                            <td colspan="5" class="text-center">目前購物車中沒有東西喔</td>
+                        </tr>
+                    </template>
 
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="text-end"><button type="button" class="btn btn-outline-danger"
-                            @click="deleteCartAll()">清空全部</button></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="text-end">總金額</td>
-                    <td class="text-end">{{cart.total}}</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td class="text-end">付款金額</td>
-                    <td class="text-end">{{cart.final_total}}</td>
-                </tr>
-            </tfoot>
-        </table>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-end"><button type="button" class="btn btn-outline-danger"
+                                @click="deleteCartAll()">清空全部</button></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-end">總金額</td>
+                        <td class="text-end">{{cart.total}}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-end">付款金額</td>
+                        <td class="text-end">{{cart.final_total}}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
         <!-- 訂單資訊 -->
         <h3 class="mt-5 mb-3 text-center">訂單資訊</h3>
         <div class="row justify-content-center">

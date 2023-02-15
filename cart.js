@@ -22,7 +22,10 @@ const app = Vue.createApp({
             cart: {},
             loadingItem: "",
             user: {},
-            isLoading: true,
+            isLoading: {
+                productList: false,
+                cart: false,
+            },
         };
     },
     methods: {
@@ -31,14 +34,14 @@ const app = Vue.createApp({
                 .get(`${api.url}/v2/api/${api.path}/products/all`)
                 .then((res) => {
                     this.productList = res.data.products;
+                    this.isLoading.productList = false;
                 });
         },
         openModal(id) {
             this.productId = id;
-            this.isLoading = true;
         },
         addToCart(product_id, qty = 1) {
-            this.isLoading = true;
+            this.isLoading.cart = true;
             const data = {
                 product_id,
                 qty,
@@ -47,14 +50,12 @@ const app = Vue.createApp({
             axios
                 .post(`${api.url}/v2/api/${api.path}/cart`, { data })
                 .then((res) => {
-                    this.closeLoading();
                     this.$refs.productModal.hide();
                     this.getCarts();
                     this.loadingItem = "";
                 })
                 .catch((err) => {
                     console.log(err);
-                    this.closeLoading();
                 });
         },
         getCarts() {
@@ -62,17 +63,22 @@ const app = Vue.createApp({
                 .get(`${api.url}/v2/api/${api.path}/cart`)
                 .then((res) => {
                     this.cart = res.data.data;
+                    this.isLoading.cart = false;
+                    console.log(res);
                 })
                 .catch((err) => {
                     console.log(err);
                 });
         },
         updateItemNum(item) {
+            console.log(item);
             const data = {
-                product_id: item.id,
+                product_id: item.product.id,
                 qty: item.qty,
             };
             this.loadingItem = item.id;
+            this.isLoading.cart = true;
+
             axios
                 .put(`${api.url}/v2/api/${api.path}/cart/${item.id}`, {
                     data,
@@ -87,11 +93,11 @@ const app = Vue.createApp({
         },
         deleteCartItem(id) {
             this.loadingItem = id;
+            this.isLoading.cart = true;
             axios
                 .delete(`${api.url}/v2/api/${api.path}/cart/${id}`)
                 .then((res) => {
                     this.getCarts();
-                    alert(res.data.message);
                     this.loadingItem = "";
                 })
                 .catch((err) => {
@@ -99,13 +105,11 @@ const app = Vue.createApp({
                 });
         },
         deleteCartAll() {
-            this.isLoading = true;
-
+            this.isLoading.cart = true;
             axios
                 .delete(`${api.url}/v2/api/${api.path}/carts`)
                 .then((res) => {
                     this.getCarts();
-                    this.closeLoading();
                 })
                 .catch((err) => {
                     console.log(err);
@@ -117,14 +121,12 @@ const app = Vue.createApp({
             axios
                 .post(`${api.url}/v2/api/${api.path}/order`, { data })
                 .then((res) => {
-                    this.closeLoading();
                     alert(res.data.message);
                     this.getCarts();
                     this.$refs.userForm.resetForm();
                 })
                 .catch((err) => {
                     console.log(err);
-                    this.closeLoading();
                 });
         },
         isPhone(value) {
@@ -132,16 +134,12 @@ const app = Vue.createApp({
             const phoneNumber = /^(09)[0-9]{8}$/;
             return phoneNumber.test(value) ? true : "需要正確的電話號碼";
         },
-        closeLoading() {
-            this.isLoading = false;
-        },
     },
     mounted() {
         this.getProducts();
         this.getCarts();
-        setTimeout(() => {
-            this.isLoading = false;
-        }, 1000);
+        this.isLoading.productList = true;
+        this.isLoading.cart = true;
     },
     components: {
         productModal,
