@@ -48,7 +48,6 @@ const app = Vue.createApp({
                 .post(`${api.url}/v2/api/${api.path}/cart`, { data })
                 .then((res) => {
                     this.closeLoading();
-                    alert(res.data.message);
                     this.$refs.productModal.hide();
                     this.getCarts();
                     this.loadingItem = "";
@@ -79,8 +78,6 @@ const app = Vue.createApp({
                     data,
                 })
                 .then((res) => {
-                    console.log(res);
-                    alert(res.data.message);
                     this.getCarts();
                     this.loadingItem = "";
                 })
@@ -96,6 +93,19 @@ const app = Vue.createApp({
                     this.getCarts();
                     alert(res.data.message);
                     this.loadingItem = "";
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        },
+        deleteCartAll() {
+            this.isLoading = true;
+
+            axios
+                .delete(`${api.url}/v2/api/${api.path}/carts`)
+                .then((res) => {
+                    this.getCarts();
+                    this.closeLoading();
                 })
                 .catch((err) => {
                     console.log(err);
