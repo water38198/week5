@@ -42,7 +42,7 @@ export default {
                                 {{i}}
                             </option>
                         </select>
-                        <button type="button" class="btn btn-danger" @click="addToCart(tempProduct.id,productNum)">加入購物車</button>
+                        <button type="button" class="btn btn-danger" @click="addToCart(tempProduct.id,qty)">加入購物車</button>
                     </div>                   
                 </div>
             </div>
@@ -65,6 +65,7 @@ export default {
         this.modal = new bootstrap.Modal(this.$refs.modal);
         this.$refs.modal.addEventListener("hidden.bs.modal", (event) => {
             this.openModal("");
+            this.qty= 1;
         });
     },
     props: ["productId", "addToCart", "openModal", "closeLoading"],

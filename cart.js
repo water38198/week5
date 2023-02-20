@@ -1,4 +1,5 @@
 import productModal from "./component/productModal.js";
+import orderComponent from "./component/orderComponent.js";
 import api from "./apiConfig.js";
 
 // 引入VeeValidate
@@ -64,7 +65,6 @@ const app = Vue.createApp({
                 .then((res) => {
                     this.cart = res.data.data;
                     this.isLoading.cart = false;
-                    console.log(res);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -114,25 +114,7 @@ const app = Vue.createApp({
                     console.log(err);
                 });
         },
-        sentOrder() {
-            const data = { user: this.user };
-            this.isLoading = true;
-            axios
-                .post(`${api.url}/v2/api/${api.path}/order`, { data })
-                .then((res) => {
-                    alert(res.data.message);
-                    this.getCarts();
-                    this.$refs.userForm.resetForm();
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        },
-        isPhone(value) {
-            //電話驗證
-            const phoneNumber = /^(09)[0-9]{8}$/;
-            return phoneNumber.test(value) ? true : "需要正確的電話號碼";
-        },
+
     },
     mounted() {
         this.getProducts();
@@ -142,6 +124,7 @@ const app = Vue.createApp({
     },
     components: {
         productModal,
+        orderComponent,
     },
 });
 app.component("VForm", VeeValidate.Form);
